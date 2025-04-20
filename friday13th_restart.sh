@@ -4,7 +4,7 @@
 # WARNING: This will forcefully restart the system when conditions are met
 
 # Configuration
-TEST_MODE=true  # Set to true for testing (uses current date regardless)
+TEST_MODE=false  # Set to true for testing (uses current date regardless)
 LOG_FILE="/var/log/friday13_restart.log"
 
 # Check root privileges
@@ -26,10 +26,12 @@ log() {
 # Check if today is Friday the 13th
 check_date() {
     local today day month weekday
-    
+
+    #if test mode is true, then today's date is acceptible
     if [ "$TEST_MODE" = true ]; then
         log "TEST MODE ACTIVE - Using current date for testing"
         today=$(date)
+        return 0
     else
         today=$(date)
     fi
@@ -63,10 +65,11 @@ if check_date; then
         
         # Actual restart command (commented for safety during testing)
         if [ "$TEST_MODE" = false ]; then
-            log "REAL RESTART WOULD OCCUR HERE"
-            # shutdown -r now
+            log "REAL RESTART WOULD OCCUR HERE, but in this case we are shutting the system down"
+            shutdown -r now
         else
             log "TEST MODE: Would restart now (command commented out)"
+            reboot
         fi
     else
         log "Not exactly on the hour (current minute: $(date +%M))"
